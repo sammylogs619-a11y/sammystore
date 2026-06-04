@@ -1,0 +1,159 @@
+# ENABLE AUTO GITHUB PUSH, LIVE CONFIGURATION & ENVIRONMENT MANAGEMENT
+
+Perform all tasks in this prompt as one coordinated update.
+
+==================================================
+GITHUB AUTO PUSH CONFIGURATION
+==================================================
+
+Configure the project so that all completed code changes can be committed and pushed to the connected GitHub repository.
+
+Requirements:
+
+- Verify GitHub repository connection.
+- Verify repository authentication.
+- Verify push permissions.
+- Verify repository branch configuration.
+
+After modifications are completed:
+
+- Stage all changed files.
+- Commit all changes.
+- Push to the main branch.
+- Verify push succeeds.
+- Return commit hash.
+
+Use meaningful commit messages.
+
+Examples:
+
+fix: enable live production configuration
+
+fix: repair environment variable loading
+
+chore: synchronize repository changes
+
+==================================================
+ENVIRONMENT VARIABLE MANAGEMENT
+==================================================
+
+Create a proper environment variable system.
+
+Requirements:
+
+Create:
+
+.env.example
+
+Include all required variables:
+
+VITE_SUPABASE_URL=
+VITE_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+
+PAYSTACK_PUBLIC_KEY=
+PAYSTACK_SECRET_KEY=
+
+NOWPAYMENTS_API_KEY=
+
+==================================================
+SECURITY REQUIREMENTS
+==================================================
+
+Do NOT hardcode secrets.
+
+Do NOT commit real secrets to GitHub.
+
+Add:
+
+.env
+
+to:
+
+.gitignore
+
+Keep actual secrets only in:
+
+- Replit Secrets
+- Cloudflare Pages Environment Variables
+- Vercel Environment Variables
+- Local .env file
+
+Commit only:
+
+.env.example
+
+==================================================
+LIVE PRODUCTION CONFIGURATION
+==================================================
+
+Audit the entire project.
+
+Verify all integrations load credentials from environment variables.
+
+Check:
+
+- Supabase
+- Google OAuth
+- Paystack
+- NOWPayments
+- Authentication
+- Wallet System
+- Admin Dashboard
+- User Dashboard
+- Product Management
+
+Remove:
+
+- Test credentials
+- Demo credentials
+- Placeholder credentials
+- Mock API keys
+
+All services must read configuration from environment variables.
+
+==================================================
+ENVIRONMENT LOADER VALIDATION
+==================================================
+
+Verify:
+
+import.meta.env
+
+is used correctly throughout the React/Vite project.
+
+Replace hardcoded values with environment variables.
+
+Example:
+
+VITE_SUPABASE_URL
+VITE_SUPABASE_ANON_KEY
+
+==================================================
+FINAL VALIDATION
+==================================================
+
+Verify:
+
+- Environment variables load correctly.
+- Supabase connection works.
+- Google OAuth configuration works.
+- Paystack configuration works.
+- NOWPayments configuration works.
+- Application builds successfully.
+- GitHub push succeeds.
+
+==================================================
+FINAL REPORT
+==================================================
+
+Return:
+
+1. Files modified.
+2. Environment variables required.
+3. Git commit hash.
+4. GitHub push confirmation.
+5. Remaining configuration steps required from the project owner.
