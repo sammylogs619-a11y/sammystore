@@ -19,7 +19,10 @@ if [ -z "$PAT_CLEAN" ]; then
   exit 1
 fi
 
-REMOTE_URL="https://${PAT_CLEAN}@github.com/${GITHUB_REPO}.git"
+# Normalise GITHUB_REPO — strip any leading https://github.com/ so both
+# "username/repo" and "https://github.com/username/repo" work.
+REPO_CLEAN=$(printf '%s' "$GITHUB_REPO" | sed 's|https://github\.com/||g' | sed 's|http://github\.com/||g' | tr -d '[:space:]')
+REMOTE_URL="https://${PAT_CLEAN}@github.com/${REPO_CLEAN}.git"
 
 git config --local user.email "replit-sync@sammystore.app" || true
 git config --local user.name  "Replit Auto-Sync" || true
