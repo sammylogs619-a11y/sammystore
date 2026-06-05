@@ -239,7 +239,7 @@ function UsersTab() {
   );
 }
 
-const emptyProduct = { id: "", title: "", slug: "", price: 0, stock: 0, published: false, description: "", image_url: "", category_id: "", currency: "NGN", created_at: "" };
+const emptyProduct: Omit<Product, "id" | "created_at"> = { title: "", slug: "", price: 0, stock: 0, published: false, description: "", image_url: "", category_id: "", currency: "NGN" };
 
 function ProductsTab() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -292,32 +292,41 @@ function ProductsTab() {
 
   const handleSave = async () => {
     if (!form.title.trim()) return toast.error("Title is required");
-    if (!form.price || form.price < 0) return toast.error("Price must be ≥ 0");
+    if (form.price == null || Number(form.price) < 0) return toast.error("Price must be ≥ 0");
     setSaving(true);
 
     const isValidUUID = (val: string | null | undefined) =>
       !!val && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val);
 
+    // Build payload explicitly — never spread `form` directly, as stale state can
+    // include id:"" which PostgreSQL rejects as an invalid UUID.
+    const now = new Date().toISOString();
     const payload = {
-      ...form,
-      slug: form.slug || slugify(form.title),
+      title: form.title.trim(),
+      slug: (form.slug || slugify(form.title)).trim(),
       price: Number(form.price),
-      stock: Number(form.stock),
+      stock: Number(form.stock) || 0,
+      published: Boolean(form.published),
+      currency: form.currency || "NGN",
       category_id: isValidUUID(form.category_id) ? form.category_id : null,
-      description: form.description || null,
-      image_url: form.image_url || null,
-      updated_at: new Date().toISOString(),
+      description: form.description?.trim() || null,
+      image_url: form.image_url?.trim() || null,
+      updated_at: now,
     };
 
     let error;
     if (editing) {
       ({ error } = await supabase.from("products").update(payload).eq("id", editing.id));
     } else {
-      ({ error } = await supabase.from("products").insert({ ...payload, created_at: new Date().toISOString() }));
+      ({ error } = await supabase.from("products").insert({ ...payload, created_at: now }));
     }
 
     setSaving(false);
-    if (error) { toast.error(error.message); return; }
+    if (error) {
+      console.error("[Products] Save error:", error);
+      toast.error(error.message);
+      return;
+    }
     toast.success(editing ? "Product updated!" : "Product created!");
     setDialogOpen(false);
     fetchData();

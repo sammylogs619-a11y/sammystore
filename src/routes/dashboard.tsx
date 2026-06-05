@@ -282,9 +282,25 @@ function ProfileTab({ profile, user }: { profile: Profile | null; user: import("
 
   const onSaveProfile = async () => {
     setSaving(true);
-    const { error } = await supabase.from("profiles").update({ display_name: displayName, phone, updated_at: new Date().toISOString() }).eq("id", user.id);
+    // Use upsert so the call succeeds whether or not a profile row already exists.
+    // onConflict:"id" updates the existing row; if absent it inserts.
+    const { error } = await supabase.from("profiles").upsert(
+      {
+        id: user.id,
+        email: user.email ?? null,
+        display_name: displayName.trim() || null,
+        phone: phone.trim() || null,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "id" }
+    );
     setSaving(false);
-    error ? toast.error("Failed to update") : toast.success("Profile updated!");
+    if (error) {
+      console.error("[Profile] Update error:", error);
+      toast.error(error.message || "Failed to update profile");
+    } else {
+      toast.success("Profile updated!");
+    }
   };
 
   const onChangePassword = async (e: React.FormEvent) => {
