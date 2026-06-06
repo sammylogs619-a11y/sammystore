@@ -54,3 +54,10 @@ export async function adminCreditWalletFn(data: { targetUserId: string; amount: 
     data
   );
 }
+
+export async function adminDebitWalletFn(data: { targetUserId: string; amount: number; description: string }) {
+  return callApi<{ success: boolean; newBalance: number }>(
+    "/api/payment/admin-debit",
+    data
+  );
+}
