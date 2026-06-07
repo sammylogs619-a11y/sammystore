@@ -4,7 +4,7 @@
   "sideEffects": false,
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"vite\" \"tsx server/api.ts\" \"bash scripts/auto-sync-loop.sh\" --kill-others-on-fail",
+    "dev": "concurrently \"vite\" \"tsx server/api.ts\" --kill-others-on-fail",
     "build": "vite build",
     "start": "node --loader tsx/esm server/api.ts",
     "start:prod": "NODE_ENV=production tsx server/api.ts",

@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import {
   Loader2, ShoppingBag, Copy, CheckCheck, ChevronDown, ChevronUp,
-  Package, CheckCircle, Clock, XCircle, RefreshCw, Key,
+  Package, CheckCircle, Clock, XCircle, RefreshCw, Key, AlertCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";

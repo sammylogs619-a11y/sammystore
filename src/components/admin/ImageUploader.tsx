@@ -2,9 +2,16 @@ import { useRef, useState } from "react";
 import { Loader2, Upload, X, Image as ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 
 const MAX_BYTES = 5 * 1024 * 1024;
 const ACCEPT = "image/png,image/jpeg,image/webp,image/gif";
+const BUCKET = "product-images";
+
+function uniqueFilename(file: File): string {
+  const ext = file.name.split(".").pop() ?? "jpg";
+  return `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+}
 
 export function ImageUploader({
   value,
@@ -25,26 +32,28 @@ export function ImageUploader({
     setUploading(true);
     setProgress(20);
 
-    const formData = new FormData();
-    formData.append("file", file);
-
     try {
-      const res = await fetch("/api/upload/image", {
-        method: "POST",
-        body: formData,
-      });
+      const filename = uniqueFilename(file);
 
-      setProgress(80);
+      setProgress(50);
 
-      if (!res.ok) {
-        const json = await res.json().catch(() => ({ error: "Upload failed" }));
-        toast.error((json as { error?: string }).error ?? "Upload failed");
+      const { data, error } = await supabase.storage
+        .from(BUCKET)
+        .upload(filename, file, { upsert: false, cacheControl: "3600" });
+
+      if (error) {
+        toast.error(error.message ?? "Upload failed");
         return;
       }
 
-      const { url } = (await res.json()) as { url: string };
+      setProgress(90);
+
+      const { data: { publicUrl } } = supabase.storage
+        .from(BUCKET)
+        .getPublicUrl(data.path);
+
       setProgress(100);
-      onChange(url);
+      onChange(publicUrl);
       toast.success("Image uploaded");
     } catch {
       toast.error("Upload failed — please try again");
