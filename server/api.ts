@@ -435,6 +435,13 @@ app.post("/api/admin/manual-deposits/verify", async (req, res) => {
       [intent.reference, adminId]
     );
 
+    // Add activity log entry for manual deposit verification
+    await client.query(
+      `INSERT INTO activity_logs (actor_id, action, target, metadata, created_at)
+       VALUES ($1, $2, $3, $4, now())`,
+      [adminId, 'verify_manual_deposit', intent.user_id, JSON.stringify({ reference: intent.reference, amount: intent.amount })]
+    );
+
     await client.query("COMMIT");
 
     return res.json({ status: "ok", reference: intent.reference, user_id: intent.user_id, amount: intent.amount, newBalance });
