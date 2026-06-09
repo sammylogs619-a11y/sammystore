@@ -1,7 +1,7 @@
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Facebook, Instagram, Twitter, Youtube, Linkedin, Music2, Send, MessageCircle, Globe, ShoppingBag, Loader2, ShoppingCart, X, Copy, CheckCheck, PackageCheck, AlertCircle, CreditC } from "lucide-react";
+import { ArrowRight, Facebook, Instagram, Twitter, Youtube, Linkedin, Music2, Send, MessageCircle, Globe, ShoppingBag, Loader2, ShoppingCart, X, Copy, CheckCheck, PackageCheck, AlertCircle, CreditCard } from "lucide-react";
 import { toast } from "sonner";
 import { PageHero } from "@/components/sections/PageHero";
 import { categories as staticCategories } from "@/data/site";
@@ -212,4 +212,47 @@ export default function ProductsPage() {
       <section className="w-full bg-background py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="text-center mb-12">
-            <h3|...
+            <h3 className="text-lg font-semibold text-brand-foreground/80">Handpicked categories</h3>
+            <h2 className="mt-3 text-3xl md:text-4xl font-extrabold">Verified accounts for sale</h2>
+          </motion.div>
+
+          {/* Categories */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 mb-8">
+            {displayCategories.map((c) => {
+              const meta = getCategoryMeta(c.slug, c.name);
+              const active = activeCategory?.id === c.id;
+              return (
+                <button key={c.id} onClick={() => setCat(c.slug)} aria-pressed={active} className={`group p-3 rounded-lg flex flex-col items-center justify-center space-y-2 ${meta.bg} ${active ? 'ring-2 ring-offset-2 ring-brand-500' : ''}`}>
+                  <meta.Icon className={`w-6 h-6 ${meta.iconColor}`} />
+                  <div className="text-xs text-slate-700 mt-1">{c.name}</div>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Products grid (simplified for brevity) */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {productsLoading ? (
+              <div className="col-span-full text-center py-12"><Loader2 className="mx-auto" /></div>
+            ) : products.map((p) => (
+              <Card key={p.id}>
+                <CardContent>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-lg font-semibold">{p.title}</h3>
+                      <div className="text-sm text-slate-500">₦{p.price.toLocaleString()}</div>
+                    </div>
+                    <div>
+                      <Button onClick={() => { setBuyTarget(p); }} disabled={p.stock <= 0}>Buy</Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+    </>
+  );
+}
