@@ -1,3 +1,1 @@
-Account Number: 610 966 0729
-Bank: OPay
-Account Name: GOODNESS CHUKWUMA IBEABUCHI
+keep on
