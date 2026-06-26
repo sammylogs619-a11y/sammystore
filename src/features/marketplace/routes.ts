@@ -1,11 +1,9 @@
 import HomePage from '@/routes/index';
 import AuthPage from '@/routes/auth';
-import DashboardPage from '@/routes/dashboard';
 import ProductsPage from '@/routes/products';
 import ProductDetailPage from '@/routes/product-detail';
 import OrdersPage from '@/routes/orders';
 import WalletPage from '@/routes/wallet';
-import AdminPage from '@/routes/admin';
 import BlogPage from '@/routes/blog';
 import ContactPage from '@/routes/contact';
 import PrivacyPage from '@/routes/privacy';
@@ -40,13 +38,9 @@ export const MARKETPLACE_ROUTES: MarketplaceRouteConfig[] = [
   // Auth routes
   { path: '/auth', component: AuthPage, label: 'Login', isPublic: true },
   
-  // Protected routes
-  { path: '/dashboard', component: DashboardPage, label: 'Dashboard', requiresAuth: true },
+  // Protected routes (marketplace-specific)
   { path: '/wallet', component: WalletPage, label: 'Wallet', requiresAuth: true },
   { path: '/orders', component: OrdersPage, label: 'Orders', requiresAuth: true },
-  
-  // Admin routes
-  { path: '/admin', component: AdminPage, label: 'Admin Panel', requiresAuth: true, requiresAdmin: true },
 ];
 
 export const getMarketplaceRouteByPath = (path: string): MarketplaceRouteConfig | undefined => {
