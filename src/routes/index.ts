@@ -2,7 +2,7 @@
 // These re-exports are non-breaking and intended to centralize imports for future refactors.
 // Do NOT remove or rename files referenced here without updating imports in src/features/marketplace/routes.ts
 
-export { default as HomePage } from './index';
+export { default as HomePage } from './home';
 export { default as AuthPage } from './auth';
 export { default as DashboardPage } from './dashboard';
 export { default as ProductsPage } from './products';
