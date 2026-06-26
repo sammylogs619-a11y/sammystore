@@ -35,7 +35,7 @@ export interface DashboardRouteConfig {
 }
 
 export const DASHBOARD_ROUTES: DashboardRouteConfig[] = [
-  { path: '/', section: 'dashboard', component: Dashboard, label: 'Dashboard', requiresAuth: true },
+  { path: '/dashboard', section: 'dashboard', component: Dashboard, label: 'Dashboard', requiresAuth: true },
   { path: '/accounts', section: 'accounts', component: Accounts, label: 'Accounts', requiresAuth: true },
   { path: '/numbers', section: 'numbers', component: Numbers, label: 'Numbers', requiresAuth: true },
   { path: '/allnumbers', section: 'allnumbers', component: AllNumbers, label: 'All Numbers', requiresAuth: true },
