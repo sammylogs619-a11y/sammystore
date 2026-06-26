@@ -16,6 +16,9 @@ export const ALL_ROUTES: AllRouteConfig[] = [
   ...ADMIN_ROUTES,
 ];
 
+// ✅ FIX: Export ROUTES as an alias so App.tsx can import it correctly
+export const ROUTES = ALL_ROUTES;
+
 /**
  * Get total route count across all features
  */
