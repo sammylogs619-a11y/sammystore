@@ -1,18 +1,20 @@
-import HomePage from '@/routes/index';
-import AuthPage from '@/routes/auth';
-import DashboardPage from '@/routes/dashboard';
-import ProductsPage from '@/routes/products';
-import ProductDetailPage from '@/routes/product-detail';
-import OrdersPage from '@/routes/orders';
-import WalletPage from '@/routes/wallet';
-import AdminPage from '@/routes/admin';
-import BlogPage from '@/routes/blog';
-import ContactPage from '@/routes/contact';
-import PrivacyPage from '@/routes/privacy';
-import TermsPage from '@/routes/terms';
-import AboutPage from '@/routes/about';
-import CategoryPage from '@/routes/category';
-import ResetPasswordPage from '@/routes/reset-password';
+import {
+  HomePage,
+  AuthPage,
+  DashboardPage,
+  ProductsPage,
+  ProductDetailPage,
+  OrdersPage,
+  WalletPage,
+  AdminPage,
+  BlogPage,
+  ContactPage,
+  PrivacyPage,
+  TermsPage,
+  AboutPage,
+  CategoryPage,
+  ResetPasswordPage
+} from '@/routes';
 import { ReactNode } from 'react';
 
 export interface MarketplaceRouteConfig {
