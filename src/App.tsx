@@ -8,10 +8,21 @@ import {
   getDashboardRouteBySection,
   SectionType
 } from './features/dashboard/routes';
-import { MARKETPLACE_ROUTES } from './features/marketplace/routes';
-import { ADMIN_ROUTES } from './features/admin/routes';
 import { ForeignNumbersCountryPage } from './pages/ForeignNumbersCountryPage';
 import { MyNumbersPage } from './pages/MyNumbersPage';
+
+import Dashboard from './pages/Dashboard';
+import Accounts from './pages/Accounts';
+import Numbers from './pages/Numbers';
+import AllNumbers from './pages/AllNumbers';
+import Pricing from './pages/Pricing';
+import FundWallet from './pages/FundWallet';
+import ReferEarn from './pages/ReferEarn';
+import AccountHistory from './pages/AccountHistory';
+import NumbersHistory from './pages/NumbersHistory';
+import TransactionHistory from './pages/TransactionHistory';
+import ApiTools from './pages/ApiTools';
+import ContactUs from './pages/ContactUs';
 
 function App() {
   const location = useLocation();
@@ -23,8 +34,7 @@ function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
-    const section = getSectionFromPath(location.pathname);
-    setCurrentSection(section);
+    setCurrentSection(getSectionFromPath(location.pathname));
   }, [location.pathname]);
 
   const handleSectionChange = (section: SectionType) => {
@@ -53,27 +63,21 @@ function App() {
         <main className="flex-1 overflow-auto">
           <div className="p-4 lg:p-8">
             <Routes>
-              {/* Dashboard routes */}
-              {DASHBOARD_ROUTES.map(route => (
-                <Route key={route.path} path={route.path} element={<>{route.component}</>} />
-              ))}
-
-              {/* Marketplace/public routes */}
-              {MARKETPLACE_ROUTES.map(route => (
-                <Route key={route.path} path={route.path} element={<>{route.component}</>} />
-              ))}
-
-              {/* Admin routes */}
-              {ADMIN_ROUTES.map(route => (
-                <Route key={route.path} path={route.path} element={<>{route.component}</>} />
-              ))}
-
-              {/* Foreign Numbers routes */}
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/accounts" element={<Accounts />} />
+              <Route path="/numbers" element={<Numbers />} />
+              <Route path="/allnumbers" element={<AllNumbers />} />
+              <Route path="/pricing" element={<Pricing />} />
+              <Route path="/fund" element={<FundWallet />} />
+              <Route path="/refer" element={<ReferEarn />} />
+              <Route path="/accounthistory" element={<AccountHistory />} />
+              <Route path="/numbershistory" element={<NumbersHistory />} />
+              <Route path="/txhistory" element={<TransactionHistory />} />
+              <Route path="/api" element={<ApiTools />} />
+              <Route path="/contact" element={<ContactUs />} />
               <Route path="/foreign-numbers/:country" element={<ForeignNumbersCountryPage />} />
               <Route path="/my-numbers" element={<MyNumbersPage />} />
-
-              {/* Fallback */}
-              <Route path="*" element={<>{DASHBOARD_ROUTES[0].component}</>} />
+              <Route path="*" element={<Dashboard />} />
             </Routes>
           </div>
         </main>
