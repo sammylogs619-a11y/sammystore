@@ -1,0 +1,180 @@
+@import "tailwindcss";
+
+* {
+  font-family: 'Inter', sans-serif;
+}
+
+.font-poppins {
+  font-family: 'Poppins', sans-serif;
+}
+
+body {
+  @apply bg-[#0a0a0f] text-[#e5e7eb];
+}
+
+/* --- Transitions & Animations --- */
+.sidebar-overlay {
+  @apply transition-opacity duration-300 ease-out;
+}
+
+.sidebar {
+  @apply transition-transform duration-300 ease-out;
+}
+
+.nav-item {
+  @apply transition-all duration-200 ease-out;
+}
+
+.nav-item:hover {
+  @apply bg-indigo-500/10;
+}
+
+.nav-item.active {
+  @apply bg-gradient-to-r from-indigo-500/20 to-transparent border-r-4 border-indigo-500;
+}
+
+.card-hover {
+  @apply transition-all duration-200;
+}
+
+.card-hover:hover {
+  @apply -translate-y-1 shadow-[0_12px_32px_rgba(99,102,241,0.15)] border-indigo-500/40;
+}
+
+.fade-in {
+  animation: fadeIn 0.4s ease forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --- Stat Cards --- */
+.stat-card {
+  @apply bg-gradient-to-br from-indigo-500 to-purple-600;
+}
+
+.stat-card-2 {
+  @apply bg-gradient-to-br from-pink-500 to-red-600;
+}
+
+.stat-card-3 {
+  @apply bg-gradient-to-br from-cyan-500 to-blue-600;
+}
+
+.stat-card-4 {
+  @apply bg-gradient-to-br from-green-500 to-teal-600;
+}
+
+/* --- Components --- */
+.product-badge {
+  @apply absolute top-3 right-3;
+}
+
+.whatsapp-btn {
+  @apply bg-gradient-to-r from-green-500 to-teal-600;
+}
+
+/* --- Scrollbar --- */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-[#13151c];
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-[#2a2d3a] rounded;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-[#3a3d4a];
+}
+
+/* --- Tabs & Modals --- */
+.tab-btn.active {
+  @apply border-b-4 border-indigo-500 text-indigo-300 font-semibold;
+}
+
+.modal-overlay {
+  @apply transition-opacity duration-300;
+}
+
+.modal-content {
+  @apply transition-transform duration-300;
+}
+
+/* --- Glass & Effects --- */
+.glass-card {
+  @apply bg-[rgba(26,29,39,0.6)] backdrop-blur-xl border border-white/6 rounded-2xl;
+}
+
+.glow-indigo {
+  @apply shadow-[0_0_40px_rgba(99,102,241,0.15)];
+}
+
+.gradient-border {
+  @apply relative;
+}
+
+.gradient-border::before {
+  content: '';
+  @apply absolute inset-0 p-px bg-gradient-to-br from-indigo-500/50 to-purple-500/50 pointer-events-none;
+  border-radius: inherit;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+/* --- Form Elements (FIXED) --- */
+input,
+select,
+textarea {
+  /* Added 'border' so the border color actually shows up */
+  @apply bg-[#13151c] text-[#e5e7eb] border border-[#2a2d3a];
+}
+
+input::placeholder,
+textarea::placeholder {
+  @apply text-[#6b7280];
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  @apply border-indigo-500 outline-none ring-2 ring-indigo-500/20; /* Added ring for better focus visibility */
+}
+
+/* --- Utility Colors --- */
+.bg-dark-card {
+  @apply bg-[#13151c];
+}
+
+.bg-dark-card-2 {
+  @apply bg-[#1a1d27];
+}
+
+.border-dark {
+  @apply border-[#252836];
+}
+
+.text-muted {
+  @apply text-[#9ca3af];
+}
+
+.text-dim {
+  @apply text-[#6b7280];
+}
+
+.hover-dark:hover {
+  @apply bg-[#1a1d27];
+}
