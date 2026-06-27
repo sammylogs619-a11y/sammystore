@@ -1,49 +1,41 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
-import { AuthProvider } from "@/lib/auth";
-import App from "./App";
-import "./styles.css";
+import React, { useEffect, useState } from 'react';
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import App from './App';
+import './index.css';
 
-class ErrorBoundary extends React.Component<
-  { children: React.ReactNode },
-  { error: Error | null }
-> {
-  constructor(props: { children: React.ReactNode }) {
-    super(props);
-    this.state = { error: null };
+function ErrorBoundary({ children }: { children: React.ReactNode }) {
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    const handleError = (e: ErrorEvent) => setError(e.error);
+    const handleRejection = (e: PromiseRejectionEvent) => setError(e.reason);
+    window.addEventListener('error', handleError);
+    window.addEventListener('unhandledrejection', handleRejection);
+    return () => {
+      window.removeEventListener('error', handleError);
+      window.removeEventListener('unhandledrejection', handleRejection);
+    };
+  }, []);
+
+  if (error) {
+    return (
+      <div style={{ padding: '20px', background: '#ff000022', color: 'white', fontSize: '14px', wordBreak: 'break-all' }}>
+        <h2>❌ Error Detected:</h2>
+        <p><strong>{error.message}</strong></p>
+        <pre style={{ background: '#000', padding: '10px', marginTop: '10px' }}>{error.stack}</pre>
+      </div>
+    );
   }
-  static getDerivedStateFromError(error: Error) {
-    return { error };
-  }
-  render() {
-    if (this.state.error) {
-      return (
-        <div style={{ padding: 40, fontFamily: "monospace", color: "red" }}>
-          <h2>App crashed during render</h2>
-          <pre style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
-            {this.state.error.message}
-            {"\n\n"}
-            {this.state.error.stack}
-          </pre>
-        </div>
-      );
-    }
-    return this.props.children;
-  }
+
+  return <>{children}</>;
 }
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
+ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ErrorBoundary>
       <BrowserRouter>
-        <ErrorBoundary>
-          <AuthProvider>
-            <ErrorBoundary>
-              <App />
-            </ErrorBoundary>
-          </AuthProvider>
-        </ErrorBoundary>
+        <App />
       </BrowserRouter>
     </ErrorBoundary>
   </React.StrictMode>

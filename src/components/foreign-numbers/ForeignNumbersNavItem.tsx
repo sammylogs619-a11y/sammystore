@@ -14,14 +14,14 @@ export function ForeignNumbersNavItem() {
     <div className="mt-1">
       <button
         onClick={() => setIsOpen(prev => !prev)}
-        className={`w-full flex items-center justify-between py-2 transition-colors font-medium text-lg border-b border-border ${
+        className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all ${
           isForeignNumbersRoute
-            ? 'text-brand-orange'
-            : 'text-brand-navy hover:text-brand-orange'
+            ? 'bg-gradient-to-r from-indigo-500/20 to-transparent border-r-4 border-indigo-500 text-indigo-300'
+            : 'text-gray-300 hover:text-gray-200'
         }`}
       >
-        <span className="flex items-center gap-2">
-          <span>🌍</span>
+        <span className="flex items-center gap-3">
+          <span className="text-lg">🌍</span>
           <span>Shop Foreign Numbers</span>
         </span>
         {isOpen
@@ -31,10 +31,10 @@ export function ForeignNumbersNavItem() {
       </button>
 
       {isOpen && (
-        <div className="mt-1 ml-3 pl-3 border-l border-border space-y-0.5 max-h-64 overflow-y-auto">
+        <div className="mt-1 ml-4 pl-3 border-l border-[#1e2030] space-y-0.5 max-h-64 overflow-y-auto">
           {loading
             ? Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="h-8 rounded bg-muted animate-pulse my-1" />
+                <div key={i} className="h-7 rounded bg-[#1a1d27] animate-pulse my-1" />
               ))
             : countries.map(country => {
                 const countrySlug = country.name.toLowerCase().replace(/\s+/g, '-');
@@ -43,14 +43,14 @@ export function ForeignNumbersNavItem() {
                   <Link
                     key={country.code}
                     to={`/foreign-numbers/${countrySlug}`}
-                    className={`flex items-center gap-2 py-2 text-sm border-b border-border/40 transition-colors ${
+                    className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-all ${
                       isActive
-                        ? 'text-brand-orange font-semibold'
-                        : 'text-brand-navy hover:text-brand-orange'
+                        ? 'text-indigo-300 bg-indigo-500/10 font-semibold'
+                        : 'text-gray-400 hover:text-gray-200 hover:bg-[#1a1d27]'
                     }`}
                   >
                     <span>{country.flag_emoji}</span>
-                    <span>{country.name}</span>
+                    <span className="truncate">{country.name}</span>
                   </Link>
                 );
               })
