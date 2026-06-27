@@ -38,3 +38,4 @@ attached_assets/
 *.njsproj
 *.sln
 *.sw?
+.env
