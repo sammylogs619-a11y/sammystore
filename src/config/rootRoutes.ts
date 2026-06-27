@@ -46,9 +46,12 @@ export interface RouteMetadata {
  * Unified route registry - the single source of truth for all routes
  * Routes are organized by feature but presented as a unified array
  */
+
+const MARKETPLACE_PATHS = new Set(MARKETPLACE_ROUTES.map(r => r.path));
+const DEDUPED_DASHBOARD_ROUTES = DASHBOARD_ROUTES.filter(r => !MARKETPLACE_PATHS.has(r.path));
 export const ALL_ROUTES: AllRouteConfig[] = [
   ...MARKETPLACE_ROUTES,  // Public marketplace routes first (includes auth routes)
-  ...DASHBOARD_ROUTES,    // Protected user dashboard routes
+  ...DEDUPED_DASHBOARD_ROUTES,  // Protected user dashboard routes (deduped against marketplace)
   ...ADMIN_ROUTES,        // Protected admin routes
 ];
 
@@ -73,7 +76,7 @@ function initializeRouteMetadata() {
   });
 
   // Dashboard routes
-  DASHBOARD_ROUTES.forEach(route => {
+  DEDUPED_DASHBOARD_ROUTES.forEach(route => {
     ROUTE_METADATA.set(route.path, {
       path: route.path,
       feature: 'dashboard',
