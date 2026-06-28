@@ -262,7 +262,7 @@ export default function Sidebar({ currentSection, onSectionChange, isOpen, onTog
               </div>
             </div>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigate('/dashboard/settings')} className="cursor-pointer">
+            <DropdownMenuItem onClick={() => navigate('/dashboard?tab=profile')} className="cursor-pointer">
               <Settings className="w-4 h-4 mr-2" /> Profile settings
             </DropdownMenuItem>
             <DropdownMenuSeparator />

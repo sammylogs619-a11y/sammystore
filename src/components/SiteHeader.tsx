@@ -184,7 +184,7 @@ export function SiteHeader() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/dashboard/settings" className="cursor-pointer">
+                  <Link to="/dashboard?tab=profile" className="cursor-pointer">
                     <Settings className="w-4 h-4 mr-2" /> Profile settings
                   </Link>
                 </DropdownMenuItem>
