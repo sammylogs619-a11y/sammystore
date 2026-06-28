@@ -113,7 +113,7 @@ class AnalyticsManager {
     };
 
     // Send to console in development
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.DEV) {
       console.log('[Analytics] Route Performance:', fullMetrics);
     }
 
@@ -134,7 +134,7 @@ class AnalyticsManager {
       statusCode,
       timestamp: Date.now(),
       sessionId: this.sessionId,
-      stack: process.env.NODE_ENV === 'development' ? stack : undefined,
+      stack: import.meta.env.DEV ? stack : undefined,
     };
 
     this.queue.push(event);
@@ -161,7 +161,7 @@ class AnalyticsManager {
 
     this.queue.push(event);
 
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.DEV) {
       console.log('[Analytics] Custom Event:', event);
     }
 
