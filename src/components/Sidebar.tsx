@@ -91,7 +91,7 @@ const NAV = [
 ];
 
 export default function Sidebar({ currentSection, onSectionChange, isOpen, onToggle }: SidebarProps) {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [balance, setBalance] = useState<number | null>(null);
@@ -237,17 +237,18 @@ export default function Sidebar({ currentSection, onSectionChange, isOpen, onTog
           </div>
           <span className="font-poppins font-bold text-lg text-white">SammyStore</span>
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button className="focus:outline-none">
-              <Avatar className="h-9 w-9">
-                <AvatarFallback className="bg-indigo-500/20 text-indigo-300 font-semibold text-sm">
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-64">
+        {!loading && user && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="focus:outline-none">
+                <Avatar className="h-9 w-9">
+                  <AvatarFallback className="bg-indigo-500/20 text-indigo-300 font-semibold text-sm">
+                    {initials}
+                  </AvatarFallback>
+                </Avatar>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-64">
             <DropdownMenuLabel className="font-normal">
               <p className="text-sm font-semibold leading-none">{displayName}</p>
               <p className="text-xs text-muted-foreground mt-1 truncate">{user?.email}</p>
@@ -271,6 +272,15 @@ export default function Sidebar({ currentSection, onSectionChange, isOpen, onTog
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+        )}
+        {!loading && !user && (
+          <button
+            onClick={() => navigate('/auth')}
+            className="text-xs font-medium text-indigo-300 px-3 py-1.5 rounded-full border border-indigo-500/30 hover:bg-indigo-500/10"
+          >
+            Log in
+          </button>
+        )}
       </div>
     </>
   );

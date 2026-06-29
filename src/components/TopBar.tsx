@@ -16,7 +16,7 @@ import {
 interface TopBarProps { pageTitle: string; }
 
 export default function TopBar({ pageTitle }: TopBarProps) {
-  const { user, signOut } = useAuth();
+  const { user, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const [balance, setBalance] = useState<number | null>(null);
   const [referralEarnings, setReferralEarnings] = useState(0);
@@ -78,6 +78,7 @@ export default function TopBar({ pageTitle }: TopBarProps) {
           <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
         </button>
 
+        {!loading && user && (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button className="flex items-center gap-3 pl-4 border-l border-[#1e2030] focus:outline-none">
@@ -122,6 +123,15 @@ export default function TopBar({ pageTitle }: TopBarProps) {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+        )}
+        {!loading && !user && (
+          <button
+            onClick={() => navigate('/auth')}
+            className="pl-4 border-l border-[#1e2030] text-sm font-semibold text-indigo-300 hover:text-indigo-200"
+          >
+            Log in
+          </button>
+        )}
       </div>
     </div>
   );
