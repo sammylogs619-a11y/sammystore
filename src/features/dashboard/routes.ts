@@ -10,8 +10,8 @@ import NumbersHistory from '@/pages/NumbersHistory';
 import TransactionHistory from '@/pages/TransactionHistory';
 import ApiTools from '@/pages/ApiTools';
 import ContactUs from '@/pages/ContactUs';
-import ForeignNumbersCountryPage from '@/pages/ForeignNumbersCountryPage';
-import MyNumbersPage from '@/pages/MyNumbersPage';
+import { ForeignNumbersCountryPage } from '@/pages/ForeignNumbersCountryPage';
+import { MyNumbersPage } from '@/pages/MyNumbersPage';
 import { ComponentType } from 'react';
 
 export type SectionType =
@@ -70,3 +70,4 @@ export const getSectionFromPath = (path: string): SectionType => {
   const route = getDashboardRouteByPath(path);
   return route?.section ?? 'dashboard';
 };
+  
