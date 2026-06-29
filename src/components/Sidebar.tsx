@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth';
 import { supabase, isSupabaseConfigured } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useEffect } from 'react';
+import { getDashboardRouteBySection } from '@/features/dashboard/routes';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   DropdownMenu,
@@ -153,7 +154,12 @@ export default function Sidebar({ currentSection, onSectionChange, isOpen, onTog
           return (
             <button
               key={item.id}
-              onClick={() => { onSectionChange(item.id); onToggle(); }}
+              onClick={() => {
+                const route = getDashboardRouteBySection(item.id as Parameters<typeof getDashboardRouteBySection>[0]);
+                if (route) navigate(route.path);
+                onSectionChange(item.id);
+                onToggle();
+              }}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                 currentSection === item.id
                   ? 'bg-gradient-to-r from-indigo-500/20 to-transparent border-r-4 border-indigo-500 text-indigo-300'
