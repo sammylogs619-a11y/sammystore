@@ -32,15 +32,6 @@ export function SiteHeader() {
   const [balance, setBalance] = useState<number | null>(null);
   const [referralEarnings, setReferralEarnings] = useState<number>(0);
 
-  // TEMPORARY DEBUG — remove once the phantom-login issue is diagnosed.
-  const debugInfo = JSON.stringify({
-    loading,
-    hasUser: !!user,
-    userId: user?.id ?? null,
-    email: user?.email ?? null,
-    isAnonymous: (user as { is_anonymous?: boolean } | null)?.is_anonymous ?? null,
-  });
-
   const displayName =
     (user?.user_metadata?.display_name as string | undefined) ||
     user?.email?.split('@')[0] ||
@@ -110,9 +101,6 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-      <div className="bg-yellow-300 text-black text-[10px] px-2 py-1 break-all font-mono">
-        DEBUG: {debugInfo}
-      </div>
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 shrink-0">
