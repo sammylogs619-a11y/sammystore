@@ -63,12 +63,13 @@ const ROUTE_METADATA: Map<string, RouteMetadata> = new Map();
 
 // Initialize route metadata
 function initializeRouteMetadata() {
-  // Marketplace routes
+  // Marketplace routes — use the 'dashboard' layout (Sidebar + TopBar) so the
+  // same permanent menu shows on every page, not just dashboard-section pages.
   MARKETPLACE_ROUTES.forEach(route => {
     ROUTE_METADATA.set(route.path, {
       path: route.path,
       feature: 'marketplace',
-      layout: 'marketplace',
+      layout: 'dashboard',
       requiresAuth: route.requiresAuth || false,
       requiresAdmin: route.requiresAdmin || false,
       label: route.label,
