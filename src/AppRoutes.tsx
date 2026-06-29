@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { DashboardLayout } from '@/features/dashboard/layout/DashboardLayout';
 import { PublicLayout } from '@/features/marketplace/layout/PublicLayout';
 import { AdminLayout } from '@/features/admin/layout/AdminLayout';
@@ -118,18 +118,14 @@ function render404(): ReactNode {
 }
 
 export default function AppRoutes() {
-  const location = useLocation();
-  const navigate = useNavigate();
   const { user, loading, isAdmin } = useAuth();
-
-  // Determine layout type based on current path
-  const layoutType = getLayoutType(location.pathname);
 
   return (
     <Routes>
       {ALL_ROUTES.map((route) => {
         const requiresAuth = requiresAuthentication(route.path);
         const requiresAdmin = requiresAdminAccess(route.path);
+        const layoutType = getLayoutType(route.path);
 
         /**
          * Route Rendering Logic:
@@ -157,7 +153,7 @@ export default function AppRoutes() {
                 ) : !isAdmin ? (
                   getLayoutWrapper(renderAdminRequired(), layoutType)
                 ) : (
-                  getLayoutWrapper(route.component, layoutType)
+                  getLayoutWrapper(<route.component />, layoutType)
                 )
               }
             />
@@ -175,7 +171,7 @@ export default function AppRoutes() {
                 ) : !user ? (
                   getLayoutWrapper(renderAuthRequired(), layoutType)
                 ) : (
-                  getLayoutWrapper(route.component, layoutType)
+                  getLayoutWrapper(<route.component />, layoutType)
                 )
               }
             />
@@ -187,7 +183,7 @@ export default function AppRoutes() {
           <Route
             key={route.path}
             path={route.path}
-            element={getLayoutWrapper(route.component, layoutType)}
+            element={getLayoutWrapper(<route.component />, layoutType)}
           />
         );
       })}
