@@ -1,18 +1,17 @@
 import{Env,buildProviders,findBestProvider}from'../../lib/providers/registry';
 import{jsonResponse,errorResponse,getSupabaseAdmin,verifyAuth}from'../../lib/supabase';
+import{resolvePricingConfig,calculateFinalPriceNgn,getExchangeRate}from'../../lib/pricing';
 export const onRequestPost:PagesFunction<Env>=async({request,env})=>{
   const userId=await verifyAuth(request,env);
   if(!userId)return errorResponse('Unauthorized',401);
   const{country_code,service_slug}=await request.json()as{country_code?:string;service_slug?:string};
   if(!country_code||!service_slug)return errorResponse('Missing fields');
   const supabase=getSupabaseAdmin(env);
-  const rate=parseFloat(env.EXCHANGE_RATE_USD_NGN??'1650');
+  const rate=getExchangeRate(env);
   const best=await findBestProvider(buildProviders(env),country_code,service_slug,rate);
   if(!best)return errorResponse('No numbers available',503);
-  const{data:cfg}=await supabase.from('fn_pricing_config').select('margin_percent,fixed_markup_ngn,override_price_ngn').eq('is_active',true).limit(1).maybeSingle();
-  let price=best.priceNgn;
-  if(cfg?.override_price_ngn)price=cfg.override_price_ngn;
-  else price=Math.ceil(best.priceNgn*(1+(cfg?.margin_percent??25)/100)+(cfg?.fixed_markup_ngn??0));
+  const config=await resolvePricingConfig(supabase,country_code,service_slug);
+  const price=calculateFinalPriceNgn(best.priceUsd,rate,config);
   const{data:prov}=await supabase.from('fn_providers').select('id').eq('slug',best.provider.slug).single();
   if(!prov)return errorResponse('Provider not found',500);
   const{data:orderId,error:rpcError}=await supabase.rpc('fn_purchase_number',{p_user_id:userId,p_country_code:country_code,p_service_slug:service_slug,p_amount_ngn:price,p_provider_id:prov.id});

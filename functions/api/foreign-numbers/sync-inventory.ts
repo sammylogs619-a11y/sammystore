@@ -1,5 +1,6 @@
 import { Env, buildProviders } from '../../lib/providers/registry';
 import { getSupabaseAdmin, jsonResponse, errorResponse } from '../../lib/supabase';
+import { resolvePricingConfig, calculateFinalPriceNgn, getExchangeRate } from '../../lib/pricing';
 
 interface SyncEnv extends Env {
   SYNC_SECRET?: string;
@@ -9,13 +10,16 @@ interface SyncEnv extends Env {
  * Pulls live prices from every configured provider (5sim, SMSHero, TigerSMS,
  * SMSPool — whichever have API keys set) for every active country x service
  * combination in fn_countries / fn_services, and upserts the cheapest-per-
- * provider rows into fn_provider_inventory.
+ * provider rows into fn_provider_inventory — with the SAME pricing formula
+ * (exchange rate + resolved markup, via functions/lib/pricing.ts) that
+ * purchase.ts and inventory.ts apply live at checkout, so the price shown
+ * while browsing never drifts from the price actually charged.
  *
- * This does NOT affect live purchases — purchase.ts and inventory.ts already
- * call providers directly in real time via findBestProvider(), independent
- * of this table. This sync exists purely so browsing pages (Numbers.tsx,
- * ForeignNumbersCountryPage) can show real prices without a live API round
- * trip per page load.
+ * This table is what the browsing pages (AllNumbers, ForeignNumbersCountryPage,
+ * Numbers, Pricing) read from via Supabase directly — it exists so those pages
+ * can show real prices without a live provider API round trip per page load.
+ * purchase.ts and inventory.ts still call providers directly in real time via
+ * findBestProvider() for the actual transaction, independent of this table.
  *
  * Protected by SYNC_SECRET so it can't be hit by arbitrary internet traffic
  * and rack up provider API usage. Call with header: x-sync-secret: <value>
@@ -35,7 +39,7 @@ export const onRequestPost: PagesFunction<SyncEnv> = async ({ request, env }) =>
     return errorResponse('No providers configured — set FIVE_SIM_API_KEY / SMSHERO_API_KEY / TIGERSMS_API_KEY / SMSPOOL_API_KEY', 503);
   }
 
-  const rate = parseFloat(env.EXCHANGE_RATE_USD_NGN ?? '1650');
+  const rate = getExchangeRate(env);
   const admin = getSupabaseAdmin(env);
 
   const [{ data: countries }, { data: services }] = await Promise.all([
@@ -101,6 +105,9 @@ export const onRequestPost: PagesFunction<SyncEnv> = async ({ request, env }) =>
           providerId = created.id;
         }
 
+        const config = await resolvePricingConfig(admin, country.code, service.slug);
+        const finalPriceNgn = calculateFinalPriceNgn(cheapest.priceUsd, rate, config);
+
         const { error: upsertErr } = await admin
           .from('fn_provider_inventory')
           .upsert(
@@ -109,7 +116,9 @@ export const onRequestPost: PagesFunction<SyncEnv> = async ({ request, env }) =>
               country_code: country.code, // store as originally seeded (uppercase), matches fn_orders.country_code usage elsewhere
               service_slug: service.slug,
               price_usd: cheapest.priceUsd,
-              price_ngn: Math.ceil(cheapest.priceUsd * rate),
+              // Same formula purchase.ts/inventory.ts use at request time: USD -> NGN via
+              // EXCHANGE_RATE_USD_NGN, then the resolved (country/service/global) markup.
+              price_ngn: finalPriceNgn,
               stock: cheapest.stock,
               is_available: true,
               synced_at: new Date().toISOString(),
