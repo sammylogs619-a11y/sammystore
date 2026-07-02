@@ -80,13 +80,36 @@ export interface FnServiceAvailability {
   service: FnService;
   best_price_ngn: number;
   total_stock: number;
-  estimated_wait_seconds: number;
+  /** Real measured average from completed orders (fn_delivery_stats). Null = not enough history yet. */
+  estimated_wait_seconds: number | null;
+  delivery_sample_size?: number;
   providers: FnProviderInventory[];
 }
 
 export interface FnSetting {
   key: string;
   value: unknown;
+}
+
+export interface FnPricingConfig {
+  id: string;
+  is_active: boolean;
+  /** NULL = applies to all countries */
+  country_code: string | null;
+  /** NULL = applies to all services */
+  service_slug: string | null;
+  margin_percent: number | null;
+  fixed_markup_ngn: number | null;
+  override_price_ngn: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface FnDeliveryStat {
+  country_code: string;
+  service_slug: string;
+  avg_delivery_seconds: number;
+  sample_size: number;
 }
 
 export interface ProviderPriceData {
