@@ -14,6 +14,264 @@ export type Database = {
   }
   public: {
     Tables: {
+      fn_countries: {
+        Row: {
+          id: string
+          code: string
+          name: string
+          flag_emoji: string
+          dial_code: string | null
+          is_active: boolean
+          sort_order: number
+        }
+        Insert: {
+          id?: string
+          code: string
+          name: string
+          flag_emoji: string
+          dial_code?: string | null
+          is_active?: boolean
+          sort_order?: number
+        }
+        Update: {
+          id?: string
+          code?: string
+          name?: string
+          flag_emoji?: string
+          dial_code?: string | null
+          is_active?: boolean
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      fn_delivery_stats: {
+        Row: {
+          country_code: string
+          service_slug: string
+          avg_delivery_seconds: number | null
+          sample_size: number | null
+        }
+        Insert: {
+          country_code: string
+          service_slug: string
+          avg_delivery_seconds?: number | null
+          sample_size?: number | null
+        }
+        Update: {
+          country_code?: string
+          service_slug?: string
+          avg_delivery_seconds?: number | null
+          sample_size?: number | null
+        }
+        Relationships: []
+      }
+      fn_orders: {
+        Row: {
+          id: string
+          user_id: string
+          provider_id: string | null
+          country_code: string
+          service_slug: string
+          phone_number: string | null
+          provider_order_id: string | null
+          amount_ngn: number
+          status: string
+          otp_code: string | null
+          otp_received_at: string | null
+          expires_at: string | null
+          cancelled_at: string | null
+          error_message: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          provider_id?: string | null
+          country_code: string
+          service_slug: string
+          phone_number?: string | null
+          provider_order_id?: string | null
+          amount_ngn?: number
+          status?: string
+          otp_code?: string | null
+          otp_received_at?: string | null
+          expires_at?: string | null
+          cancelled_at?: string | null
+          error_message?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          provider_id?: string | null
+          country_code?: string
+          service_slug?: string
+          phone_number?: string | null
+          provider_order_id?: string | null
+          amount_ngn?: number
+          status?: string
+          otp_code?: string | null
+          otp_received_at?: string | null
+          expires_at?: string | null
+          cancelled_at?: string | null
+          error_message?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      fn_pricing_config: {
+        Row: {
+          id: string
+          is_active: boolean
+          country_code: string | null
+          service_slug: string | null
+          margin_percent: number | null
+          fixed_markup_ngn: number | null
+          override_price_ngn: number | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          is_active?: boolean
+          country_code?: string | null
+          service_slug?: string | null
+          margin_percent?: number | null
+          fixed_markup_ngn?: number | null
+          override_price_ngn?: number | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          is_active?: boolean
+          country_code?: string | null
+          service_slug?: string | null
+          margin_percent?: number | null
+          fixed_markup_ngn?: number | null
+          override_price_ngn?: number | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      fn_providers: {
+        Row: {
+          id: string
+          slug: string
+          name: string
+          api_base_url: string | null
+          is_active: boolean
+          priority: number
+          balance_usd: number | null
+          last_synced: string | null
+        }
+        Insert: {
+          id?: string
+          slug: string
+          name: string
+          api_base_url?: string | null
+          is_active?: boolean
+          priority?: number
+          balance_usd?: number | null
+          last_synced?: string | null
+        }
+        Update: {
+          id?: string
+          slug?: string
+          name?: string
+          api_base_url?: string | null
+          is_active?: boolean
+          priority?: number
+          balance_usd?: number | null
+          last_synced?: string | null
+        }
+        Relationships: []
+      }
+      fn_provider_inventory: {
+        Row: {
+          id: string
+          provider_id: string
+          country_code: string
+          service_slug: string
+          price_usd: number
+          price_ngn: number | null
+          stock: number
+          is_available: boolean
+          synced_at: string
+        }
+        Insert: {
+          id?: string
+          provider_id: string
+          country_code: string
+          service_slug: string
+          price_usd: number
+          price_ngn?: number | null
+          stock?: number
+          is_available?: boolean
+          synced_at?: string
+        }
+        Update: {
+          id?: string
+          provider_id?: string
+          country_code?: string
+          service_slug?: string
+          price_usd?: number
+          price_ngn?: number | null
+          stock?: number
+          is_available?: boolean
+          synced_at?: string
+        }
+        Relationships: []
+      }
+      fn_services: {
+        Row: {
+          id: string
+          slug: string
+          name: string
+          icon_url: string | null
+          category: string | null
+          is_active: boolean
+          sort_order: number
+        }
+        Insert: {
+          id?: string
+          slug: string
+          name: string
+          icon_url?: string | null
+          category?: string | null
+          is_active?: boolean
+          sort_order?: number
+        }
+        Update: {
+          id?: string
+          slug?: string
+          name?: string
+          icon_url?: string | null
+          category?: string | null
+          is_active?: boolean
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      fn_settings: {
+        Row: {
+          key: string
+          value: Json | null
+        }
+        Insert: {
+          key: string
+          value?: Json | null
+        }
+        Update: {
+          key?: string
+          value?: Json | null
+        }
+        Relationships: []
+      }
       activity_logs: {
         Row: {
           action: string
@@ -38,6 +296,42 @@ export type Database = {
           id?: string
           metadata?: Json | null
           target?: string | null
+        }
+        Relationships: []
+      }
+      bank_transfer_requests: {
+        Row: {
+          id: string
+          user_id: string
+          amount: number
+          reference: string
+          sender_name: string
+          receipt_url: string | null
+          status: string
+          created_at: string
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          amount: number
+          reference: string
+          sender_name: string
+          receipt_url?: string | null
+          status?: string
+          created_at?: string
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          amount?: number
+          reference?: string
+          sender_name?: string
+          receipt_url?: string | null
+          status?: string
+          created_at?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -324,6 +618,30 @@ export type Database = {
         }
         Relationships: []
       }
+      referral_earnings: {
+        Row: {
+          id: string
+          user_id: string
+          amount: number
+          description: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          amount?: number
+          description?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          amount?: number
+          description?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
       site_settings: {
         Row: {
           key: string
@@ -476,9 +794,9 @@ export type Database = {
     }
     Enums: {
       app_role: "user" | "admin"
-      order_status: "pending" | "completed" | "failed" | "refunded"
+      order_status: "pending" | "completed" | "failed" | "refunded" | "pending_credentials"
       payment_provider: "paystack" | "nowpayments" | "manual"
-      tx_status: "pending" | "success" | "failed" | "reversed"
+      tx_status: "pending" | "success" | "failed" | "reversed" | "submitted"
       tx_type: "credit" | "debit"
     }
     CompositeTypes: {

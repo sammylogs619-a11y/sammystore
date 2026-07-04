@@ -39,7 +39,7 @@ export default function BankTransferTopup({ userId }: { userId: string }) {
         amount: numAmount,
         reference: reference.trim(),
         sender_name: senderName.trim(),
-        receipt_url: receiptPath,
+        receipt_url: receiptPath ?? null,
         status: "pending",
       });
 

@@ -346,13 +346,13 @@ function CategoriesTab() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
 
-  const fetch = async () => {
+  const loadCategories = async () => {
     setLoading(true);
     const { data } = await supabase.from("product_categories").select("*").order("name");
     setCats((data as Category[]) ?? []);
     setLoading(false);
   };
-  useEffect(() => { fetch(); }, []);
+  useEffect(() => { void loadCategories(); }, []);
 
   const slugify = (t: string) => t.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
@@ -374,11 +374,11 @@ function CategoriesTab() {
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify(editing ? { id: editing.id, ...payload } : payload),
     });
-    const json = await res.json() as { error?: string };
+    const json = await res.json().catch(() => ({ error: "Save failed" })) as { error?: string };
     setSaving(false);
     if (!res.ok) { toast.error(json.error ?? "Save failed"); return; }
     toast.success(editing ? "Category updated!" : "Category created!");
-    setDialogOpen(false); fetch();
+    setDialogOpen(false); void loadCategories();
   };
 
   const handleDelete = async () => {
@@ -391,12 +391,12 @@ function CategoriesTab() {
     });
     setDeleting(false); setDeleteId(null);
     if (!res.ok) {
-      const j = await res.json().catch(() => ({ error: "Delete failed" }));
-      toast.error((j as { error?: string }).error ?? "Delete failed");
+      const j = await res.json().catch(() => ({ error: "Delete failed" })) as { error?: string };
+      toast.error(j.error ?? "Delete failed");
     } else {
       toast.success("Category deleted");
     }
-    fetch();
+    void loadCategories();
   };
 
   return (
@@ -888,7 +888,7 @@ function OrdersTab() {
   useEffect(() => { fetchOrders(); }, []);
 
   const updateStatus = async (id: string, status: string) => {
-    const { error } = await supabase.from("orders").update({ status: status as "completed" | "failed" | "pending" | "refunded" | "pending_credentials" }).eq("id", id);
+    const { error } = await supabase.from("orders").update({ status: (status as "completed" | "failed" | "pending" | "refunded" | "pending_credentials") }).eq("id", id);
     if (error) toast.error(error.message); else { toast.success("Order updated"); fetchOrders(); }
   };
 

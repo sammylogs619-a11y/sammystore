@@ -228,7 +228,7 @@ export default function FundWallet() {
       amount: numAmount,
       reference: btReference.trim(),
       sender_name: btSenderName.trim(),
-      receipt_url: btReceiptPath,
+      receipt_url: btReceiptPath ?? null,
       status: 'pending',
     });
     setBtLoading(false);

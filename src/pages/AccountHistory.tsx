@@ -30,7 +30,7 @@ export default function AccountHistory() {
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
       .limit(50)
-      .then(({ data }) => { setOrders((data as Order[]) ?? []); setLoading(false); });
+      .then(({ data }) => { setOrders((data as unknown as Order[]) ?? []); setLoading(false); });
   }, [user]);
 
   const formatDate = (d: string) =>

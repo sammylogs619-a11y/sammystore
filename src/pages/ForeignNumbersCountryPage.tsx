@@ -23,7 +23,7 @@ export function ForeignNumbersCountryPage() {
   const [purchaseData, setPurchaseData] = useState<FnServiceAvailability | null>(null);
 
   const categories = useMemo(() => {
-    const cats = new Set(services.map(s => s.category).filter(Boolean));
+    const cats = new Set(services.map(s => s.category).filter((cat): cat is string => Boolean(cat)));
     return ['all', ...Array.from(cats)];
   }, [services]);
 

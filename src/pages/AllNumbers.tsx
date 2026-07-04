@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useCountries, useCountryLowestPrices } from '@/hooks/useForeignNumbers';
+import { normalizeCountryCode } from '@/lib/foreignNumbersPricing';
 
 export default function AllNumbers() {
   const navigate = useNavigate();
@@ -46,7 +47,7 @@ export default function AllNumbers() {
                 <span className="text-4xl block mb-2">{country.flag_emoji}</span>
                 <p className="font-medium text-white text-sm">{country.name}</p>
                 <p className="text-indigo-400 font-bold text-xs mt-2">
-                  {lowest != null ? `From ₦${lowest.toLocaleString()}` : 'Unavailable'}
+                  {lowest != null ? `From ₦${lowest.toLocaleString()}` : 'Coming soon'}
                 </p>
               </button>
             );

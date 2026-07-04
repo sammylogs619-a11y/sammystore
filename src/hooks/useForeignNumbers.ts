@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { normalizeCountryCode } from '@/lib/foreignNumbersPricing';
 import type { FnCountry, FnService, FnOrder, FnServiceAvailability } from '../types/foreignNumbers';
 
 export function useCountries() {
@@ -27,7 +28,8 @@ export function useCountryServices(countryCode: string | undefined) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!countryCode) return;
+    const normalizedCountryCode = normalizeCountryCode(countryCode);
+    if (!normalizedCountryCode) return;
     setLoading(true);
 
     supabase
@@ -38,34 +40,49 @@ export function useCountryServices(countryCode: string | undefined) {
       .then(async ({ data: svcs }) => {
         setServices(svcs ?? []);
 
-        const [{ data: inventory }, { data: delivery }] = await Promise.all([
+        const [{ data: inventory }, { data: delivery }, { data: pricingConfig }, { data: settings }] = await Promise.all([
           supabase
             .from('fn_provider_inventory')
             .select('*')
-            .eq('country_code', countryCode)
+            .eq('country_code', normalizedCountryCode)
             .eq('is_available', true)
             .gt('stock', 0),
-          // Real measured OTP delivery times from completed orders — replaces
-          // the old hardcoded "~1 min" constant. No row yet = "Varies" in the UI.
           supabase
             .from('fn_delivery_stats')
             .select('service_slug,avg_delivery_seconds,sample_size')
-            .eq('country_code', countryCode),
+            .eq('country_code', normalizedCountryCode),
+          supabase
+            .from('fn_pricing_config')
+            .select('service_slug, country_code, margin_percent, override_price_ngn')
+            .eq('is_active', true),
+          supabase
+            .from('fn_settings')
+            .select('key, value')
+            .in('key', ['exchange_rate_usd_ngn']),
         ]);
 
         const deliveryMap: Record<string, number> = {};
         for (const row of delivery ?? []) {
-          deliveryMap[row.service_slug] = row.avg_delivery_seconds;
+          deliveryMap[row.service_slug] = row.avg_delivery_seconds ?? 0;
         }
+
+        const exchangeRate = Number((((settings ?? []) as Array<{ key: string; value: unknown }>).find((s) => s.key === 'exchange_rate_usd_ngn')?.value as string | number | null | undefined) ?? 1650);
+        const pricingRules = (pricingConfig ?? []) as Array<{ service_slug: string | null; country_code: string | null; margin_percent: number | null; override_price_ngn: number | null }>;
 
         const availMap: Record<string, FnServiceAvailability> = {};
         for (const item of inventory ?? []) {
           if (!availMap[item.service_slug]) {
             const svc = svcs?.find(s => s.slug === item.service_slug);
             if (!svc) continue;
+            const rule = pricingRules.find((row) =>
+              row.country_code === normalizedCountryCode && row.service_slug === item.service_slug
+            ) ?? pricingRules.find((row) => row.country_code === normalizedCountryCode && row.service_slug === null)
+              ?? pricingRules.find((row) => row.country_code === null && row.service_slug === item.service_slug)
+              ?? pricingRules.find((row) => row.country_code === null && row.service_slug === null);
+            const finalPrice = Math.ceil((Number(item.price_usd || 0) * exchangeRate) * (1 + Number(rule?.margin_percent ?? 25) / 100));
             availMap[item.service_slug] = {
               service: svc,
-              best_price_ngn: item.price_ngn ?? 0,
+              best_price_ngn: rule?.override_price_ngn ? Math.ceil(rule.override_price_ngn) : finalPrice,
               total_stock: item.stock,
               estimated_wait_seconds: deliveryMap[item.service_slug] ?? null,
               providers: [],
@@ -73,8 +90,14 @@ export function useCountryServices(countryCode: string | undefined) {
           } else {
             const current = availMap[item.service_slug];
             current.total_stock += item.stock;
-            if ((item.price_ngn ?? Infinity) < current.best_price_ngn) {
-              current.best_price_ngn = item.price_ngn ?? current.best_price_ngn;
+            const rule = pricingRules.find((row) =>
+              row.country_code === normalizedCountryCode && row.service_slug === item.service_slug
+            ) ?? pricingRules.find((row) => row.country_code === normalizedCountryCode && row.service_slug === null)
+              ?? pricingRules.find((row) => row.country_code === null && row.service_slug === item.service_slug)
+              ?? pricingRules.find((row) => row.country_code === null && row.service_slug === null);
+            const candidatePrice = rule?.override_price_ngn ? Math.ceil(rule.override_price_ngn) : Math.ceil((Number(item.price_usd || 0) * exchangeRate) * (1 + Number(rule?.margin_percent ?? 25) / 100));
+            if (candidatePrice < current.best_price_ngn) {
+              current.best_price_ngn = candidatePrice;
             }
           }
           availMap[item.service_slug].providers.push(item);
@@ -101,15 +124,21 @@ export function useCountryLowestPrices() {
   useEffect(() => {
     supabase
       .from('fn_provider_inventory')
-      .select('country_code,price_ngn')
+      .select('country_code,price_usd')
       .eq('is_available', true)
       .gt('stock', 0)
-      .then(({ data }) => {
+      .then(async ({ data }) => {
+        const { data: settings } = await supabase.from('fn_settings').select('key, value').in('key', ['exchange_rate_usd_ngn']);
+        const { data: pricingConfig } = await supabase.from('fn_pricing_config').select('country_code, service_slug, margin_percent, override_price_ngn').eq('is_active', true);
+        const exchangeRate = Number((((settings ?? []) as Array<{ key: string; value: unknown }>).find((s) => s.key === 'exchange_rate_usd_ngn')?.value as string | number | null | undefined) ?? 1650);
         const lowest: Record<string, number> = {};
         for (const row of data ?? []) {
-          if (row.price_ngn == null) continue;
-          if (lowest[row.country_code] == null || row.price_ngn < lowest[row.country_code]) {
-            lowest[row.country_code] = row.price_ngn;
+          const rule = (pricingConfig ?? []).find((item: { country_code: string | null; service_slug: string | null; margin_percent: number | null; override_price_ngn: number | null }) =>
+            item.country_code === row.country_code && item.service_slug === null
+          ) ?? (pricingConfig ?? []).find((item: { country_code: string | null; service_slug: string | null; margin_percent: number | null; override_price_ngn: number | null }) => item.country_code === null && item.service_slug === null);
+          const price = rule?.override_price_ngn ? Math.ceil(rule.override_price_ngn) : Math.ceil((Number(row.price_usd || 0) * exchangeRate) * (1 + Number(rule?.margin_percent ?? 25) / 100));
+          if (lowest[row.country_code] == null || price < lowest[row.country_code]) {
+            lowest[row.country_code] = price;
           }
         }
         setLowestByCountry(lowest);
@@ -144,27 +173,35 @@ export function usePricingTable() {
     Promise.all([
       supabase.from('fn_countries').select('*').eq('is_active', true).order('sort_order'),
       supabase.from('fn_services').select('*').eq('is_active', true).order('sort_order'),
-      supabase.from('fn_provider_inventory').select('country_code,service_slug,price_ngn,stock').eq('is_available', true).gt('stock', 0),
-    ]).then(([{ data: countries }, { data: services }, { data: inventory }]) => {
-      const countryMap = new Map((countries ?? []).map(c => [c.code, c]));
+      supabase.from('fn_provider_inventory').select('country_code,service_slug,price_usd,stock').eq('is_available', true).gt('stock', 0),
+      supabase.from('fn_settings').select('key, value').in('key', ['exchange_rate_usd_ngn']),
+      supabase.from('fn_pricing_config').select('country_code, service_slug, margin_percent, override_price_ngn').eq('is_active', true),
+    ]).then(([{ data: countries }, { data: services }, { data: inventory }, { data: settings }, { data: pricingConfig }]) => {
+      const countryMap = new Map((countries ?? []).map(c => [c.code.toUpperCase(), c]));
       const serviceMap = new Map((services ?? []).map(s => [s.slug, s]));
+      const exchangeRate = Number((((settings ?? []) as Array<{ key: string; value: unknown }>).find((s) => s.key === 'exchange_rate_usd_ngn')?.value as string | number | null | undefined) ?? 1650);
       const best = new Map<string, PricingTableRow>();
 
       for (const item of inventory ?? []) {
-        if (item.price_ngn == null) continue;
-        const country = countryMap.get(item.country_code);
+        const country = countryMap.get(String(item.country_code || '').toUpperCase());
         const service = serviceMap.get(item.service_slug);
         if (!country || !service) continue;
+        const rule = (pricingConfig ?? []).find((row: { country_code: string | null; service_slug: string | null; margin_percent: number | null; override_price_ngn: number | null }) =>
+          row.country_code === item.country_code && row.service_slug === item.service_slug
+        ) ?? (pricingConfig ?? []).find((row: { country_code: string | null; service_slug: string | null; margin_percent: number | null; override_price_ngn: number | null }) => row.country_code === item.country_code && row.service_slug === null)
+          ?? (pricingConfig ?? []).find((row: { country_code: string | null; service_slug: string | null; margin_percent: number | null; override_price_ngn: number | null }) => row.country_code === null && row.service_slug === item.service_slug)
+          ?? (pricingConfig ?? []).find((row: { country_code: string | null; service_slug: string | null; margin_percent: number | null; override_price_ngn: number | null }) => row.country_code === null && row.service_slug === null);
+        const price = rule?.override_price_ngn ? Math.ceil(rule.override_price_ngn) : Math.ceil((Number(item.price_usd || 0) * exchangeRate) * (1 + Number(rule?.margin_percent ?? 25) / 100));
         const key = `${item.country_code}:${item.service_slug}`;
         const existing = best.get(key);
-        if (!existing || item.price_ngn < existing.price_ngn) {
+        if (!existing || price < existing.price_ngn) {
           best.set(key, {
             country_code: item.country_code,
             country_name: country.name,
             flag_emoji: country.flag_emoji,
             service_slug: item.service_slug,
             service_name: service.name,
-            price_ngn: item.price_ngn,
+            price_ngn: price,
             stock: item.stock,
           });
         } else if (existing) {

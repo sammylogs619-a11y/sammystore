@@ -9,6 +9,7 @@ export interface Env {
   SMSHERO_API_KEY?: string;
   TIGERSMS_API_KEY?: string;
   SMSPOOL_API_KEY?: string;
+  SYNC_SECRET?: string;
   SUPABASE_URL: string;
   SUPABASE_SERVICE_ROLE_KEY: string;
   EXCHANGE_RATE_USD_NGN?: string;

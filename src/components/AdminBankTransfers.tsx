@@ -28,10 +28,10 @@ export default function AdminBankTransfers() {
       .order("created_at", { ascending: false })
       .limit(50);
     if (!error && data) {
-      setTransfers(data as Transfer[]);
+      setTransfers((data as unknown as Transfer[]) ?? []);
 
       // Generate signed URLs for any attached receipts (bucket is private).
-      const withReceipts = (data as Transfer[]).filter(t => t.receipt_url);
+      const withReceipts = (data as unknown as Transfer[]).filter(t => t.receipt_url);
       const links: Record<string, string> = {};
       await Promise.all(
         withReceipts.map(async (t) => {

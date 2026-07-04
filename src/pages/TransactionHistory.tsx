@@ -23,7 +23,7 @@ export default function TransactionHistory() {
       .select('id, tx_type, amount, description, status, created_at')
       .order('created_at', { ascending: false })
       .limit(50)
-      .then(({ data }) => { setTransactions((data as Transaction[]) ?? []); setLoading(false); });
+      .then(({ data }) => { setTransactions((data as unknown as Transaction[]) ?? []); setLoading(false); });
   }, [user]);
 
   const formatDate = (d: string) =>

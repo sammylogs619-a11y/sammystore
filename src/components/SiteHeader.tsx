@@ -89,7 +89,8 @@ export function SiteHeader() {
           setReferralEarnings(0);
           return;
         }
-        const total = (data ?? []).reduce((sum, row: { amount: number }) => sum + (row.amount ?? 0), 0);
+        const rows = (data ?? []) as Array<{ amount?: number | null }>;
+        const total = rows.reduce((sum, row) => sum + (row.amount ?? 0), 0);
         setReferralEarnings(total);
       });
   }, [user]);

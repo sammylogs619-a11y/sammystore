@@ -46,7 +46,8 @@ export default function TopBar({ pageTitle }: TopBarProps) {
       .eq('user_id', user.id)
       .then(({ data, error }) => {
         if (error) { setReferralEarnings(0); return; }
-        setReferralEarnings((data ?? []).reduce((sum, row: { amount: number }) => sum + (row.amount ?? 0), 0));
+        const rows = (data ?? []) as Array<{ amount?: number | null }>;
+        setReferralEarnings(rows.reduce((sum, row) => sum + (row.amount ?? 0), 0));
       });
   }, [user]);
 

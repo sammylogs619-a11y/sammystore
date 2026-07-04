@@ -30,18 +30,26 @@ export default function ProductDetailPage() {
   const [purchasing, setPurchasing] = useState(false);
 
   useEffect(() => {
-    if (!slug) return;
-    fetchProduct();
+    if (!slug) {
+      setLoading(false);
+      return;
+    }
+    void fetchProduct();
   }, [slug]);
 
   const fetchProduct = async () => {
+    if (!slug) {
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     const { data, error } = await supabase
       .from("products")
       .select("*")
       .eq("slug", slug)
       .eq("published", true)
-      .single();
+      .maybeSingle();
 
     if (error || !data) {
       toast.error("Product not found");
@@ -62,7 +70,7 @@ export default function ProductDetailPage() {
   const handleBuyNow = async () => {
     if (!user) {
       toast.error("Please login to purchase");
-      navigate("/auth?redirect=/products/" + slug);
+      navigate("/auth?redirect=/products/" + (slug ?? ""));
       return;
     }
 

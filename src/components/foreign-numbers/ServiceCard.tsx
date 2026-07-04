@@ -9,6 +9,7 @@ interface Props {
 
 export function ServiceCard({ service, availability, onBuyNow }: Props) {
   const isAvailable = !!availability && availability.total_stock > 0;
+  const canBuy = isAvailable && availability?.best_price_ngn != null;
 
   return (
     <div className={`rounded-xl border p-4 flex flex-col gap-3 transition-all duration-200 ${
@@ -69,10 +70,11 @@ export function ServiceCard({ service, availability, onBuyNow }: Props) {
           )}
         </div>
         <button
-          onClick={onBuyNow}
-          disabled={!isAvailable}
+          type="button"
+          onClick={canBuy ? onBuyNow : undefined}
+          disabled={!canBuy}
           className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
-            isAvailable
+            canBuy
               ? 'bg-brand-orange text-white hover:bg-brand-orange-hover active:scale-95'
               : 'bg-muted text-muted-foreground cursor-not-allowed'
           }`}

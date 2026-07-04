@@ -9,7 +9,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { verifyPaystackPayment } from "@/lib/api/payment";
 
-declare global { interface Window { PaystackPop: { setup(o: Record<string, unknown>): { openIframe(): void } } } }
+declare global {
+  interface Window {
+    PaystackPop: {
+      setup(o: Record<string, unknown>): { openIframe(): void };
+    };
+  }
+}
 
 const PRESETS = [1000, 2000, 5000, 10000, 20000, 50000];
 
@@ -26,7 +32,6 @@ export function PaystackTopUpDialog({ open, onOpenChange, user, defaultAmount, o
   const [loading, setLoading] = useState(false);
   const psLoaded = useRef(false);
 
-  // Manual deposit states
   const [method, setMethod] = useState<"paystack" | "manual">("paystack");
   const [manualRef, setManualRef] = useState<string | null>(null);
   const [manualCreated, setManualCreated] = useState(false);
@@ -61,7 +66,12 @@ export function PaystackTopUpDialog({ open, onOpenChange, user, defaultAmount, o
     const ref = `ss-${Date.now()}-${Math.random().toString(36).substring(2, 10)}`;
 
     const { error: intentErr } = await supabase.from("payment_intents").insert({
-      user_id: user.id, provider: "paystack", reference: ref, amount: amt, currency: "NGN", status: "pending",
+      user_id: user.id,
+      provider: "paystack",
+      reference: ref,
+      amount: amt,
+      currency: "NGN",
+      status: "pending",
     });
 
     setLoading(false);
@@ -74,14 +84,17 @@ export function PaystackTopUpDialog({ open, onOpenChange, user, defaultAmount, o
       ref,
       currency: "NGN",
       callback_url: `${window.location.origin}/wallet?ref=${ref}&userId=${user.id}`,
-      metadata: { userId: user.id, custom_fields: [{ display_name: "User ID", variable_name: "user_id", value: user.id }] },
+      metadata: {
+        userId: user.id,
+        custom_fields: [{ display_name: "User ID", variable_name: "user_id", value: user.id }],
+      },
       onSuccess: async (tx: { reference: string }) => {
         const tid = toast.loading("Verifying payment…");
         try {
           const result = await verifyPaystackPayment({ reference: tx.reference, userId: user.id });
           toast.dismiss(tid);
           if (result.alreadyCredited) toast.info("Payment already credited");
-          else toast.success(`₦${result.amount?.toLocaleString()} added to your wallet!");
+          else toast.success(`₦${result.amount?.toLocaleString()} added to your wallet!`);
           const { data } = await supabase.from("wallets").select("balance").eq("user_id", user.id).single();
           onFunded?.(data ? Number(data.balance) : null);
           onOpenChange(false);
@@ -97,7 +110,6 @@ export function PaystackTopUpDialog({ open, onOpenChange, user, defaultAmount, o
     handler.openIframe();
   };
 
-  // Manual deposit handlers
   const BANK_NAME = import.meta.env.VITE_MANUAL_BANK_NAME ?? "Contact admin for bank details";
   const ACCOUNT_NUMBER = import.meta.env.VITE_MANUAL_ACCOUNT_NUMBER ?? "";
   const ACCOUNT_NAME = import.meta.env.VITE_MANUAL_ACCOUNT_NAME ?? "";
@@ -111,7 +123,12 @@ export function PaystackTopUpDialog({ open, onOpenChange, user, defaultAmount, o
     const ref = `manual-${Date.now()}-${Math.random().toString(36).substring(2, 10)}`;
     setManualSubmitting(true);
     const { error: intentErr } = await supabase.from("payment_intents").insert({
-      user_id: user.id, provider: "manual", reference: ref, amount: amt, currency: "NGN", status: "pending",
+      user_id: user.id,
+      provider: "manual",
+      reference: ref,
+      amount: amt,
+      currency: "NGN",
+      status: "pending",
     });
     setManualSubmitting(false);
     if (intentErr) {
@@ -126,7 +143,7 @@ export function PaystackTopUpDialog({ open, onOpenChange, user, defaultAmount, o
   const handleNotifyPaid = async () => {
     if (!manualRef) return;
     setManualSubmitting(true);
-    const { error } = await supabase.from("payment_intents").update({ status: "submitted" }).eq("reference", manualRef);
+    const { error } = await supabase.from("payment_intents").update({ status: "pending" as "pending" | "success" | "failed" | "reversed" }).eq("reference", manualRef);
     setManualSubmitting(false);
     if (error) {
       toast.error("Failed to notify — please contact support");
@@ -158,10 +175,18 @@ export function PaystackTopUpDialog({ open, onOpenChange, user, defaultAmount, o
 
         <div className="py-2 space-y-4">
           <div className="flex items-center gap-2">
-            <button onClick={() => setMethod("paystack")} className={`px-3 py-1 rounded-md ${method === "paystack" ? "bg-brand-orange text-white" : "border border-border"}`}>
+            <button
+              type="button"
+              onClick={() => setMethod("paystack")}
+              className={`px-3 py-1 rounded-md ${method === "paystack" ? "bg-brand-orange text-white" : "border border-border"}`}
+            >
               Paystack / Card
             </button>
-            <button onClick={() => setMethod("manual")} className={`px-3 py-1 rounded-md ${method === "manual" ? "bg-brand-orange text-white" : "border border-border"}`}>
+            <button
+              type="button"
+              onClick={() => setMethod("manual")}
+              className={`px-3 py-1 rounded-md ${method === "manual" ? "bg-brand-orange text-white" : "border border-border"}`}
+            >
               Manual deposit
             </button>
           </div>
@@ -176,8 +201,12 @@ export function PaystackTopUpDialog({ open, onOpenChange, user, defaultAmount, o
                 <Label className="text-xs font-medium text-muted-foreground mb-2 block">Quick amounts</Label>
                 <div className="flex flex-wrap gap-2">
                   {PRESETS.map((p) => (
-                    <button key={p} type="button" onClick={() => setAmount(String(p))}
-                      className={`px-3 py-1.5 rounded-lg text-xs border transition-colors ${amount === String(p) ? "bg-brand-orange text-white border-brand-orange" : "border-border hover:border-border/80"}`}>
+                    <button
+                      key={p}
+                      type="button"
+                      onClick={() => setAmount(String(p))}
+                      className={`px-3 py-1.5 rounded-lg text-xs border transition-colors ${amount === String(p) ? "bg-brand-orange text-white border-brand-orange" : "border-border hover:border-border/80"}`}
+                    >
                       ₦{p.toLocaleString()}
                     </button>
                   ))}
@@ -185,8 +214,15 @@ export function PaystackTopUpDialog({ open, onOpenChange, user, defaultAmount, o
               </div>
               <div>
                 <Label htmlFor="topup-amount">Amount (₦)</Label>
-                <Input id="topup-amount" type="number" min="100" placeholder="Enter amount" value={amount}
-                  onChange={(e) => setAmount(e.target.value)} className="mt-1" />
+                <Input
+                  id="topup-amount"
+                  type="number"
+                  min="100"
+                  placeholder="Enter amount"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  className="mt-1"
+                />
               </div>
             </>
           ) : (
@@ -197,8 +233,15 @@ export function PaystackTopUpDialog({ open, onOpenChange, user, defaultAmount, o
 
               <div>
                 <Label htmlFor="topup-amount">Amount (₦)</Label>
-                <Input id="topup-amount" type="number" min="100" placeholder="Enter amount" value={amount}
-                  onChange={(e) => setAmount(e.target.value)} className="mt-1" />
+                <Input
+                  id="topup-amount"
+                  type="number"
+                  min="100"
+                  placeholder="Enter amount"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  className="mt-1"
+                />
               </div>
 
               {manualCreated && manualRef && (

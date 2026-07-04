@@ -27,14 +27,18 @@ export function SiteHeader() {
   const { user, loading, signOut, isAdmin } = useAuth();
 
   useEffect(() => {
-    supabase
-      .from("product_categories")
-      .select("id, name, slug")
-      .order("name", { ascending: true })
-      .then(({ data }) => {
-        if (data?.length) setCategories(data as Category[]);
-      })
-      .catch(() => {});
+    const loadCategories = async () => {
+      const { data, error } = await supabase
+        .from("product_categories")
+        .select("id, name, slug")
+        .order("name", { ascending: true });
+
+      if (!error && data?.length) {
+        setCategories(data as Category[]);
+      }
+    };
+
+    void loadCategories();
   }, []);
 
   return (

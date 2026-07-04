@@ -77,7 +77,7 @@ function AdminProviders() {
 
   useEffect(() => {
     supabase.from('fn_providers').select('*').order('priority').then(({ data }) => {
-      setProviders(data ?? []);
+      setProviders((data as FnProvider[] | null) ?? []);
       setLoading(false);
     });
   }, []);
@@ -121,14 +121,14 @@ function AdminOrders() {
 
   useEffect(() => {
     supabase.from('fn_orders').select('*').order('created_at', { ascending: false }).limit(100).then(({ data }) => {
-      setOrders(data ?? []);
+      setOrders((data as FnOrder[] | null) ?? []);
       setLoading(false);
     });
   }, []);
 
   const refundOrder = async (orderId: string) => {
     setRefunding(orderId);
-    await supabase.rpc('fn_refund_order', { p_order_id: orderId, p_reason: 'Admin manual refund' });
+    await (supabase.rpc as unknown as (name: string, args: Record<string, unknown>) => Promise<unknown>)('fn_refund_order', { p_order_id: orderId, p_reason: 'Admin manual refund' });
     setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: 'refunded' as const } : o));
     setRefunding(null);
   };
@@ -237,7 +237,7 @@ function AdminSettings() {
 
   const updateScope = async (id: string, field: 'country_code' | 'service_slug', value: string) => {
     setConfigs(prev => prev.map(c => c.id === id ? { ...c, [field]: value } : c));
-    await supabase.from('fn_pricing_config').update({ [field]: value }).eq('id', id);
+    await supabase.from('fn_pricing_config').update({ [field]: value } as { country_code?: string | null; service_slug?: string | null }).eq('id', id);
   };
 
   if (loading) return <div className="h-48 bg-muted animate-pulse rounded-xl" />;

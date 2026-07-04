@@ -4,19 +4,18 @@
  */
 
 import { useEffect, useRef } from 'react';
-import { useRouter } from '@tanstack/react-router';
 import { analyticsManager } from './analytics';
 
 export function useRouteAnalytics() {
-  const router = useRouter();
+  const router = undefined as { subscribe?: (callback: (state: unknown) => void) => () => void } | undefined;
   const previousPathRef = useRef<string>('');
   const navigationStartTimeRef = useRef<number>(0);
 
   useEffect(() => {
-    if (!router) return;
+    if (!router?.subscribe) return;
 
     // Subscribe to router events
-    const unsubscribe = router.subscribe((state) => {
+    const unsubscribe = router.subscribe(() => {
       // Track page view on location change
       const currentPath = window.location.pathname;
       const currentSearch = window.location.search;
@@ -65,10 +64,10 @@ export function useRouteAnalytics() {
  * Wrap your app with this to enable route analytics
  */
 export function RouteMonitor({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
+  const router = undefined as { subscribe?: (callback: (state: unknown) => void) => () => void } | undefined;
 
   useEffect(() => {
-    if (!router) return;
+    if (!router?.subscribe) return;
 
     // Track initial page view
     const currentPath = window.location.pathname;
@@ -76,7 +75,7 @@ export function RouteMonitor({ children }: { children: React.ReactNode }) {
     analyticsManager.trackPageView(currentPath, currentSearch);
 
     // Subscribe to route changes
-    const unsubscribe = router.subscribe((state) => {
+    const unsubscribe = router.subscribe(() => {
       const path = window.location.pathname;
       const search = window.location.search;
 

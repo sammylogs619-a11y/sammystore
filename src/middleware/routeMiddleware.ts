@@ -310,7 +310,7 @@ export function useRouteMiddleware() {
  */
 export function useRouteTransition(callback: RouteChangeListener) {
   const location = useLocation();
-  const previousLocationRef = useRef<string>();
+  const previousLocationRef = useRef<string | undefined>(undefined);
   const manager = getMiddlewareManager();
 
   useEffect(() => {
@@ -332,16 +332,17 @@ export function useRouteTransition(callback: RouteChangeListener) {
  */
 export function useRouteLifecycle(hooks: RouteLifecycleHooks) {
   const location = useLocation();
-  const previousLocationRef = useRef<string>();
+  const previousLocationRef = useRef<string | undefined>(undefined);
   const manager = getMiddlewareManager();
 
   // Add beforeChange middleware
   useEffect(() => {
-    if (hooks.onBeforeChange) {
-      manager.use(hooks.onBeforeChange);
+    const beforeChange = hooks.onBeforeChange;
+    if (beforeChange) {
+      manager.use(beforeChange);
       
       return () => {
-        manager.removeMiddleware(hooks.onBeforeChange);
+        manager.removeMiddleware(beforeChange);
       };
     }
   }, [hooks.onBeforeChange, manager]);

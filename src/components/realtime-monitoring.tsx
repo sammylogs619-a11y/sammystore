@@ -59,7 +59,8 @@ export function RealtimeMonitoringDashboard() {
 
   const filteredEvents = events.filter((event) => {
     if (filter === 'all') return true;
-    return event.type === filter;
+    if (filter === 'errors') return event.type === 'error';
+    return event.type === 'page_view';
   });
 
   const getSeverityColor = (severity?: string) => {

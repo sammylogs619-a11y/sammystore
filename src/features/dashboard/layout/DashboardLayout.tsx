@@ -25,7 +25,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const pageTitle = currentSection.charAt(0).toUpperCase() + currentSection.slice(1);
 
   return (
-    <div className="flex h-screen bg-[#0a0a0f]">
+    <div className="flex h-screen bg-white">
       <Sidebar
         currentSection={currentSection}
         onSectionChange={setCurrentSection}

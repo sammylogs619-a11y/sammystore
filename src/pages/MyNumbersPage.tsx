@@ -106,7 +106,7 @@ export function MyNumbersPage() {
       ) : (
         <div className="space-y-3">
           {filtered.map(order => {
-            const cfg = STATUS_CONFIG[order.status];
+            const cfg = STATUS_CONFIG[order.status as FnOrderStatus] ?? STATUS_CONFIG.pending;
             return (
               <div key={order.id} className="rounded-xl border border-border bg-white p-4 space-y-3">
                 <div className="flex items-start justify-between gap-2">

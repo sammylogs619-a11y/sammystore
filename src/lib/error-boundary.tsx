@@ -33,7 +33,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
       error.message,
       window.location.pathname,
       undefined,
-      errorInfo.componentStack
+      errorInfo.componentStack ?? undefined
     );
 
     // Log to console in development

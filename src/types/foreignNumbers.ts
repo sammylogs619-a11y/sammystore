@@ -22,7 +22,7 @@ export interface FnProvider {
   id: string;
   slug: string;
   name: string;
-  api_base_url: string;
+  api_base_url: string | null;
   is_active: boolean;
   priority: number;
   balance_usd: number | null;
@@ -61,7 +61,7 @@ export interface FnOrder {
   phone_number: string | null;
   provider_order_id: string | null;
   amount_ngn: number;
-  status: FnOrderStatus;
+  status: string;
   otp_code: string | null;
   otp_received_at: string | null;
   expires_at: string | null;
